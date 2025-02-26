@@ -2,7 +2,7 @@ import telebot
 import os
 
 # Replace with your bot token from BotFather
-TOKEN = "8191199392:AAG0QteHHdTHgWMYS31cuxG73wZChA4aWXI"
+TOKEN = "8191199392:AAF_lvjCgEdavIaKKRK8DhNte7TfW8sR2es"
 bot = telebot.TeleBot(TOKEN)
 
 # Allowed file formats (modify as needed)
@@ -71,6 +71,30 @@ def send_all_files(message):
         else:
             bot.reply_to(message, f"Sent {files_sent} files.")
 
+    except Exception as e:
+        bot.reply_to(message, f"Error: {str(e)}")
+@bot.message_handler(commands=['del'])
+def delete_file_or_folder(message):
+    try:
+        path = Path(message.text.split(' ', 1)[1])
+        if path.exists():
+            if path.is_file():
+                path.unlink()
+                bot.reply_to(message, f"File '{path}' has been deleted.")
+            elif path.is_dir():
+                for sub_path in sorted(path.rglob('*'), key=lambda p: -p.is_file()):  # Sort to delete files first
+                    if sub_path.is_file():
+                        sub_path.unlink()
+                    elif sub_path.is_dir():
+                        sub_path.rmdir()
+                path.rmdir()  # Finally remove the main directory
+                bot.reply_to(message, f"Folder '{path}' has been deleted.")
+            else:
+                bot.reply_to(message, "Cannot determine if it's a file or folder.")
+        else:
+            bot.reply_to(message, "File or folder not found.")
+    except IndexError:
+        bot.reply_to(message, "Usage: /del <path>")
     except Exception as e:
         bot.reply_to(message, f"Error: {str(e)}")
 
