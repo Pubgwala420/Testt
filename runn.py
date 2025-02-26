@@ -1,10 +1,12 @@
 import telebot
 import os
-import shutil  # Needed to remove directories
 
 # Replace with your bot token from BotFather
 TOKEN = "8191199392:AAG0QteHHdTHgWMYS31cuxG73wZChA4aWXI"
 bot = telebot.TeleBot(TOKEN)
+
+# Allowed file formats (modify as needed)
+ALLOWED_EXTENSIONS = {".txt", ".pdf", ".jpg", ".png", ".zip", ".mp4",".py",".json",".html"}
 
 # Command to list files in the bot's directory
 @bot.message_handler(commands=['list'])
@@ -18,7 +20,7 @@ def list_files(message):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.reply_to(message, "Hi! Use /list to see files, /ch <directory> to change directory, /get <filename> to retrieve a file, and /del <path> to delete a file or folder.")
+    bot.reply_to(message, "Hi! Use /list to see files, /ch <directory> to change directory, /get <filename> to retrieve a file, and /getall to get all files in the current directory.")
 
 # Command to change directory
 @bot.message_handler(commands=['ch'])
@@ -52,24 +54,23 @@ def send_file(message):
     except Exception as e:
         bot.reply_to(message, f"Error: {str(e)}")
 
-# Command to delete a file or directory
-@bot.message_handler(commands=['del'])
-def delete_file_or_folder(message):
+# Command to get all allowed files in the current directory
+@bot.message_handler(commands=['getall'])
+def send_all_files(message):
     try:
-        path = message.text.split(' ', 1)[1]
-        if os.path.exists(path):
-            if os.path.isfile(path):
-                os.remove(path)
-                bot.reply_to(message, f"File '{path}' has been deleted.")
-            elif os.path.isdir(path):
-                shutil.rmtree(path)
-                bot.reply_to(message, f"Folder '{path}' has been deleted.")
-            else:
-                bot.reply_to(message, "Cannot determine if it's a file or folder.")
+        files_sent = 0
+        for file in os.listdir(os.getcwd()):
+            file_path = os.path.join(os.getcwd(), file)
+            if os.path.isfile(file_path) and any(file.endswith(ext) for ext in ALLOWED_EXTENSIONS):
+                with open(file_path, 'rb') as f:
+                    bot.send_document(message.chat.id, f)
+                files_sent += 1
+
+        if files_sent == 0:
+            bot.reply_to(message, "No valid files found to send.")
         else:
-            bot.reply_to(message, "File or folder not found.")
-    except IndexError:
-        bot.reply_to(message, "Usage: /del <path>")
+            bot.reply_to(message, f"Sent {files_sent} files.")
+
     except Exception as e:
         bot.reply_to(message, f"Error: {str(e)}")
 
