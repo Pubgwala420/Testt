@@ -3,11 +3,11 @@ import os
 import shutil
 
 # Replace with your bot token from BotFather
-TOKEN = "8191199392:AAF_lvjCgEdavIaKKRK8DhNte7TfW8sR2es"
+TOKEN = "YOUR_BOT_TOKEN_HERE"
 bot = telebot.TeleBot(TOKEN)
 
 # Allowed file formats for /getall
-ALLOWED_EXTENSIONS = {".txt", ".pdf", ".jpg", ".png", ".zip", ".mp4"}
+ALLOWED_EXTENSIONS = {".txt", ".pdf", ".jpg", ".png", ".zip", ".mp4",".py"}
 
 # Command to list files and folders in the current directory
 @bot.message_handler(commands=['list'])
