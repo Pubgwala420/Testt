@@ -3,7 +3,7 @@ import os
 import shutil
 
 # Replace with your bot token from BotFather
-TOKEN = "8010409321:AAGyaKkm5VXgSgouTH7TUH9yPfnwlh-JZTE"
+TOKEN = "8010409321:AAFweo0KpnGQJhlK-qPCxlEK_xegwxlkllU"
 bot = telebot.TeleBot(TOKEN)
 
 # Allowed file formats for /getall
